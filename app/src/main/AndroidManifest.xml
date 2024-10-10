@@ -13,9 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RemindMe"
-        tools:targetApi="31">
+        tools:targetApi="34">
         <receiver
-            android:name=".AlarmReceiver">
+            android:name=".ReminderReceiver">
         </receiver>
         <activity
             android:name=".MainActivity"

@@ -63,9 +63,9 @@ import com.example.remindme.R
 import com.example.remindme.Reminder
 import com.example.remindme.ReminderDao
 import com.example.remindme.ReminderListVM
-import com.example.remindme.cancelAlarm
+import com.example.remindme.ReminderManager
+import com.example.remindme.ReminderReceiver
 import com.example.remindme.dateTimeParser
-import com.example.remindme.setAlarm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -152,7 +152,7 @@ fun ReminderCard(rem: Reminder, nav: NavController, vm: ReminderListVM, scope: C
                 onClick = {
                     vm.remove(rem)
                     scope.launch { dao.delete(rem) }
-                    cancelAlarm(nav.context, rem.id)
+                    ReminderManager.removeReminder(nav.context, rem.id)
                 }
             ) {
                 Icon(
@@ -215,12 +215,19 @@ fun AddingReminderScr(nav: NavController, vm: ReminderListVM, scope: CoroutineSc
                                     scope.launch {
                                         vm.replace(ForcedToUpdate!!.id, rnew)
                                         dao.update(ForcedToUpdate!!, rnew)
+                                        ReminderReceiver.ContentText = rnew.title
+                                        ReminderManager.updateReminder(
+                                            nav.context,
+                                            ForcedToUpdate!!.id,
+                                            rnew.dateTime
+                                        )
                                     }
                                 }
                                 else {
                                     vm.add(rnew)
                                     scope.launch { dao.insert(rnew) }
-                                    setAlarm(nav.context, rnew.id, rnew.dateTime)
+                                    ReminderReceiver.ContentText = rnew.title
+                                    ReminderManager.setReminder(nav.context, rnew.id, rnew.dateTime)
                                 }
                                 nav.navigate("main_scr") {
                                     popUpTo("main_scr") {
@@ -306,7 +313,7 @@ fun DefTextFld(value: String, onVal: (String) -> Unit = {}, tIcon: @Composable (
         textStyle = TextStyle(fontSize = 20.sp),
         onValueChange = onVal,
         trailingIcon = tIcon,
-        placeholder = { Text("Описание", color = Color.Black.copy(0.3f)) },
+        placeholder = { Text("Название", color = Color.Black.copy(0.3f)) },
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = Color.Transparent,
             focusedContainerColor = Color.Transparent,
